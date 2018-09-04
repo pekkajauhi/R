@@ -12,6 +12,24 @@ Decision Tree
 First I used a simple decision tree. I tried to use pruning to cut back the tree, but it turns out that the fully grown tree has the lowest cross-validated error so pruning is not needed.
 
 ``` r
+# Converting '?' to NA and removing rows with missing values.
+levels(data$workclass)[1] <- NA
+levels(data$occupation)[1] <- NA
+levels(data$native.country)[1] <- NA
+
+nrow(data)
+```
+
+    ## [1] 32561
+
+``` r
+data <- na.omit(data)
+nrow(data)
+```
+
+    ## [1] 30162
+
+``` r
 # Creating a train-test-split
 set.seed(1234)
 train <- sample(nrow(data), 0.7*nrow(data))
@@ -27,20 +45,20 @@ income_model <- rpart(formula = over50K ~ .,
 print(income_model)
 ```
 
-    ## n= 22792 
+    ## n= 21113 
     ## 
     ## node), split, n, loss, yval, (yprob)
     ##       * denotes terminal node
     ## 
-    ##  1) root 22792 5543  <=50K (0.75680063 0.24319937)  
-    ##    2) relationship= Not-in-family, Other-relative, Own-child, Unmarried 12500  844  <=50K (0.93248000 0.06752000)  
-    ##      4) capital.gain< 7073.5 12289  644  <=50K (0.94759541 0.05240459) *
-    ##      5) capital.gain>=7073.5 211   11  >50K (0.05213270 0.94786730) *
-    ##    3) relationship= Husband, Wife 10292 4699  <=50K (0.54343179 0.45656821)  
-    ##      6) education= 10th, 11th, 12th, 1st-4th, 5th-6th, 7th-8th, 9th, Assoc-acdm, Assoc-voc, HS-grad, Preschool, Some-college 7200 2432  <=50K (0.66222222 0.33777778)  
-    ##       12) capital.gain< 5095.5 6833 2073  <=50K (0.69661935 0.30338065) *
-    ##       13) capital.gain>=5095.5 367    8  >50K (0.02179837 0.97820163) *
-    ##      7) education= Bachelors, Doctorate, Masters, Prof-school 3092  825  >50K (0.26681759 0.73318241) *
+    ##  1) root 21113 5226  <=50K (0.75247478 0.24752522)  
+    ##    2) relationship= Not-in-family, Other-relative, Own-child, Unmarried 11393  786  <=50K (0.93101027 0.06898973)  
+    ##      4) capital.gain< 7073.5 11180  578  <=50K (0.94830054 0.05169946) *
+    ##      5) capital.gain>=7073.5 213    5  >50K (0.02347418 0.97652582) *
+    ##    3) relationship= Husband, Wife 9720 4440  <=50K (0.54320988 0.45679012)  
+    ##      6) education= 10th, 11th, 12th, 1st-4th, 5th-6th, 7th-8th, 9th, Assoc-acdm, Assoc-voc, HS-grad, Preschool, Some-college 6823 2315  <=50K (0.66070643 0.33929357)  
+    ##       12) capital.gain< 5095.5 6486 1982  <=50K (0.69441875 0.30558125) *
+    ##       13) capital.gain>=5095.5 337    4  >50K (0.01186944 0.98813056) *
+    ##      7) education= Bachelors, Doctorate, Masters, Prof-school 2897  772  >50K (0.26648257 0.73351743) *
 
 ``` r
 # Results
@@ -64,25 +82,25 @@ confusionMatrix(data = class_prediction,
     ## 
     ##           Reference
     ## Prediction  <=50K  >50K
-    ##      <=50K   7068  1099
-    ##      >50K     403  1199
+    ##      <=50K   6430  1116
+    ##      >50K     337  1166
     ##                                           
-    ##                Accuracy : 0.8462          
-    ##                  95% CI : (0.8389, 0.8533)
-    ##     No Information Rate : 0.7648          
+    ##                Accuracy : 0.8394          
+    ##                  95% CI : (0.8317, 0.8469)
+    ##     No Information Rate : 0.7478          
     ##     P-Value [Acc > NIR] : < 2.2e-16       
     ##                                           
-    ##                   Kappa : 0.5226          
+    ##                   Kappa : 0.52            
     ##  Mcnemar's Test P-Value : < 2.2e-16       
     ##                                           
-    ##             Sensitivity : 0.9461          
-    ##             Specificity : 0.5218          
-    ##          Pos Pred Value : 0.8654          
-    ##          Neg Pred Value : 0.7484          
-    ##              Prevalence : 0.7648          
-    ##          Detection Rate : 0.7235          
-    ##    Detection Prevalence : 0.8360          
-    ##       Balanced Accuracy : 0.7339          
+    ##             Sensitivity : 0.9502          
+    ##             Specificity : 0.5110          
+    ##          Pos Pred Value : 0.8521          
+    ##          Neg Pred Value : 0.7758          
+    ##              Prevalence : 0.7478          
+    ##          Detection Rate : 0.7106          
+    ##    Detection Prevalence : 0.8339          
+    ##       Balanced Accuracy : 0.7306          
     ##                                           
     ##        'Positive' Class :  <=50K          
     ## 
@@ -124,14 +142,14 @@ ce(actual = data.test$over50K,
    predicted = pred1)
 ```
 
-    ## [1] 0.1537517
+    ## [1] 0.1605702
 
 ``` r
 ce(actual = data.test$over50K, 
    predicted = pred2)
 ```
 
-    ## [1] 0.1537517
+    ## [1] 0.1605702
 
 ``` r
 plotcp(income_model)
@@ -144,10 +162,10 @@ print(income_model$cptable)
 ```
 
     ##           CP nsplit rel error    xerror       xstd
-    ## 1 0.13007397      0 1.0000000 1.0000000 0.01168472
-    ## 2 0.06332311      2 0.7398521 0.7634855 0.01059073
-    ## 3 0.03409706      3 0.6765290 0.7252390 0.01038083
-    ## 4 0.01000000      4 0.6424319 0.6509111 0.00994184
+    ## 1 0.12944891      0 1.0000000 1.0000000 0.01199945
+    ## 2 0.06295446      2 0.7411022 0.7411022 0.01076089
+    ## 3 0.03884424      3 0.6781477 0.6781477 0.01039145
+    ## 4 0.01000000      4 0.6393035 0.6393035 0.01014757
 
 ``` r
 # Retrieving optimal cp value based on cross-validated error
@@ -179,25 +197,25 @@ confusionMatrix(data = class_prediction,
     ## 
     ##           Reference
     ## Prediction  <=50K  >50K
-    ##      <=50K   7068  1099
-    ##      >50K     403  1199
+    ##      <=50K   6430  1116
+    ##      >50K     337  1166
     ##                                           
-    ##                Accuracy : 0.8462          
-    ##                  95% CI : (0.8389, 0.8533)
-    ##     No Information Rate : 0.7648          
+    ##                Accuracy : 0.8394          
+    ##                  95% CI : (0.8317, 0.8469)
+    ##     No Information Rate : 0.7478          
     ##     P-Value [Acc > NIR] : < 2.2e-16       
     ##                                           
-    ##                   Kappa : 0.5226          
+    ##                   Kappa : 0.52            
     ##  Mcnemar's Test P-Value : < 2.2e-16       
     ##                                           
-    ##             Sensitivity : 0.9461          
-    ##             Specificity : 0.5218          
-    ##          Pos Pred Value : 0.8654          
-    ##          Neg Pred Value : 0.7484          
-    ##              Prevalence : 0.7648          
-    ##          Detection Rate : 0.7235          
-    ##    Detection Prevalence : 0.8360          
-    ##       Balanced Accuracy : 0.7339          
+    ##             Sensitivity : 0.9502          
+    ##             Specificity : 0.5110          
+    ##          Pos Pred Value : 0.8521          
+    ##          Neg Pred Value : 0.7758          
+    ##              Prevalence : 0.7478          
+    ##          Detection Rate : 0.7106          
+    ##    Detection Prevalence : 0.8339          
+    ##       Balanced Accuracy : 0.7306          
     ##                                           
     ##        'Positive' Class :  <=50K          
     ## 
@@ -227,21 +245,21 @@ auc(actual = ifelse(data.test$over50K == " >50K", 1, 0),
     predicted = pred[,2]) 
 ```
 
-    ## [1] 0.8488216
+    ## [1] 0.8415106
 
 ``` r
 auc(actual = ifelse(data.test$over50K == " >50K", 1, 0), 
     predicted = pred1[,2]) 
 ```
 
-    ## [1] 0.8488216
+    ## [1] 0.8415106
 
 ``` r
 auc(actual = ifelse(data.test$over50K == " >50K", 1, 0), 
     predicted = pred2[,2]) 
 ```
 
-    ## [1] 0.8488216
+    ## [1] 0.8415106
 
 ``` r
 dt_preds <- pred[,2]
@@ -265,22 +283,24 @@ set.seed(1234)
 str(data.train)
 ```
 
-    ## 'data.frame':    22792 obs. of  15 variables:
-    ##  $ age           : int  26 44 43 22 30 36 41 36 48 45 ...
-    ##  $ workclass     : Factor w/ 9 levels " ?"," Federal-gov",..: 5 5 5 5 5 5 6 5 5 5 ...
-    ##  $ fnlwgt        : int  290286 185798 160246 137862 241885 220696 34987 213008 268234 1366120 ...
-    ##  $ education     : Factor w/ 16 levels " 10th"," 11th",..: 12 9 16 16 16 12 16 12 12 9 ...
-    ##  $ education.num : int  9 11 10 10 10 9 10 9 9 11 ...
-    ##  $ marital.status: Factor w/ 7 levels " Divorced"," Married-AF-spouse",..: 5 6 1 5 3 1 3 1 1 1 ...
-    ##  $ occupation    : Factor w/ 15 levels " ?"," Adm-clerical",..: 4 4 11 2 6 8 6 6 4 9 ...
-    ##  $ relationship  : Factor w/ 6 levels " Husband"," Not-in-family",..: 2 3 5 3 1 2 1 2 2 2 ...
-    ##  $ race          : Factor w/ 5 levels " Amer-Indian-Eskimo",..: 3 5 3 5 5 5 5 5 5 5 ...
-    ##  $ sex           : Factor w/ 2 levels " Female"," Male": 2 2 1 1 2 2 2 2 2 1 ...
-    ##  $ capital.gain  : int  0 0 0 0 0 0 0 0 0 0 ...
+    ## 'data.frame':    21113 obs. of  15 variables:
+    ##  $ age           : int  32 39 55 44 42 52 35 50 34 33 ...
+    ##  $ workclass     : Factor w/ 8 levels " Federal-gov",..: 4 4 4 4 4 4 4 4 4 4 ...
+    ##  $ fnlwgt        : int  107843 280570 208451 442035 202565 194259 193815 110748 209101 129707 ...
+    ##  $ education     : Factor w/ 16 levels " 10th"," 11th",..: 12 10 13 16 4 12 8 16 10 10 ...
+    ##  $ education.num : int  9 13 14 10 2 9 12 10 13 13 ...
+    ##  $ marital.status: Factor w/ 7 levels " Divorced"," Married-AF-spouse",..: 3 3 3 1 3 1 3 5 3 5 ...
+    ##  $ occupation    : Factor w/ 14 levels " Adm-clerical",..: 7 4 4 10 7 12 1 10 4 1 ...
+    ##  $ relationship  : Factor w/ 6 levels " Husband"," Not-in-family",..: 1 1 1 2 1 2 1 2 1 2 ...
+    ##  $ race          : Factor w/ 5 levels " Amer-Indian-Eskimo",..: 5 5 5 5 5 5 5 5 5 5 ...
+    ##  $ sex           : Factor w/ 2 levels " Female"," Male": 2 2 2 1 2 1 2 2 2 2 ...
+    ##  $ capital.gain  : int  5178 3103 0 0 0 0 0 0 5178 0 ...
     ##  $ capital.loss  : int  0 0 0 0 0 0 0 0 0 0 ...
-    ##  $ hours.per.week: int  40 48 40 16 40 40 54 40 50 8 ...
-    ##  $ native.country: Factor w/ 42 levels " ?"," Cambodia",..: 40 40 40 40 40 40 40 40 40 40 ...
-    ##  $ over50K       : Factor w/ 2 levels " <=50K"," >50K": 1 2 1 1 1 1 2 1 1 1 ...
+    ##  $ hours.per.week: int  50 50 40 40 40 40 40 40 55 60 ...
+    ##  $ native.country: Factor w/ 41 levels " Cambodia"," Canada",..: 39 39 39 39 22 11 39 39 39 39 ...
+    ##  $ over50K       : Factor w/ 2 levels " <=50K"," >50K": 2 2 2 1 1 1 2 1 2 2 ...
+    ##  - attr(*, "na.action")=Class 'omit'  Named int [1:2399] 15 28 39 52 62 70 78 94 107 129 ...
+    ##   .. ..- attr(*, "names")= chr [1:2399] "15" "28" "39" "52" ...
 
 ``` r
 levels(data.train$over50K)[1] <- "under50K"
@@ -302,18 +322,18 @@ print(income_caret_model)
     ## 
     ## No pre-processing
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 81, 80, 79, 79, 81 
+    ## Summary of sample sizes: 80, 80, 79, 80, 81 
     ## Resampling results:
     ## 
     ##   ROC        Sens       Spec     
-    ##   0.7452206  0.9279412  0.2666667
+    ##   0.8841117  0.8769231  0.6642857
 
 ``` r
 # Print the CV AUC
 income_caret_model$results[,"ROC"]
 ```
 
-    ## [1] 0.7452206
+    ## [1] 0.8841117
 
 ``` r
 # Generate predictions on the test set
@@ -328,7 +348,7 @@ auc(actual = ifelse(data.test$over50K == " >50K", 1, 0),
     predicted = pred[,"over50K"])
 ```
 
-    ## [1] 0.8217895
+    ## [1] 0.8104694
 
 Random Forest
 -------------
@@ -351,31 +371,31 @@ print(income_model)
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 3
     ## 
-    ##         OOB estimate of  error rate: 13.81%
+    ##         OOB estimate of  error rate: 14.22%
     ## Confusion matrix:
     ##          under50K over50K class.error
-    ## under50K    16073    1176  0.06817787
-    ## over50K      1972    3571  0.35576403
+    ## under50K    14790    1097  0.06905017
+    ## over50K      1906    3320  0.36471489
 
 ``` r
 print(importance(income_model, type=2))
 ```
 
     ##                MeanDecreaseGini
-    ## age                   831.79126
-    ## workclass             272.81800
-    ## fnlwgt                766.57525
-    ## education             484.48535
-    ## education.num         519.99131
-    ## marital.status        673.10095
-    ## occupation            707.06383
-    ## relationship          876.23406
-    ## race                   97.41441
-    ## sex                   106.09112
-    ## capital.gain          832.32628
-    ## capital.loss          239.65204
-    ## hours.per.week        490.37355
-    ## native.country        201.17150
+    ## age                   755.19862
+    ## workclass             252.87559
+    ## fnlwgt                723.51214
+    ## education             467.64592
+    ## education.num         470.02743
+    ## marital.status        691.50034
+    ## occupation            647.27148
+    ## relationship          773.08882
+    ## race                   83.68463
+    ## sex                    91.74862
+    ## capital.gain          781.40934
+    ## capital.loss          232.97887
+    ## hours.per.week        460.06116
+    ## native.country        158.14336
 
 ``` r
 varImpPlot(income_model)
@@ -422,25 +442,25 @@ print(cm)
     ## 
     ##           Reference
     ## Prediction under50K over50K
-    ##   under50K     6959     762
-    ##   over50K       512    1536
+    ##   under50K     6330     833
+    ##   over50K       437    1449
     ##                                           
-    ##                Accuracy : 0.8696          
-    ##                  95% CI : (0.8627, 0.8762)
-    ##     No Information Rate : 0.7648          
+    ##                Accuracy : 0.8597          
+    ##                  95% CI : (0.8523, 0.8667)
+    ##     No Information Rate : 0.7478          
     ##     P-Value [Acc > NIR] : < 2.2e-16       
     ##                                           
-    ##                   Kappa : 0.6234          
-    ##  Mcnemar's Test P-Value : 3.034e-12       
+    ##                   Kappa : 0.6052          
+    ##  Mcnemar's Test P-Value : < 2.2e-16       
     ##                                           
-    ##             Sensitivity : 0.9315          
-    ##             Specificity : 0.6684          
-    ##          Pos Pred Value : 0.9013          
-    ##          Neg Pred Value : 0.7500          
-    ##              Prevalence : 0.7648          
-    ##          Detection Rate : 0.7124          
-    ##    Detection Prevalence : 0.7904          
-    ##       Balanced Accuracy : 0.7999          
+    ##             Sensitivity : 0.9354          
+    ##             Specificity : 0.6350          
+    ##          Pos Pred Value : 0.8837          
+    ##          Neg Pred Value : 0.7683          
+    ##              Prevalence : 0.7478          
+    ##          Detection Rate : 0.6995          
+    ##    Detection Prevalence : 0.7916          
+    ##       Balanced Accuracy : 0.7852          
     ##                                           
     ##        'Positive' Class : under50K        
     ## 
@@ -450,13 +470,13 @@ print(cm)
 paste0("Test Accuracy: ", cm$overall[1])
 ```
 
-    ## [1] "Test Accuracy: 0.869587470570171"
+    ## [1] "Test Accuracy: 0.859653000331528"
 
 ``` r
 paste0("OOB Accuracy: ", 1 - oob_err)
 ```
 
-    ## [1] "OOB Accuracy: 0.861881361881362"
+    ## [1] "OOB Accuracy: 0.857765357836404"
 
 ``` r
 # Generating predictions on the test set
@@ -475,13 +495,13 @@ res <- tuneRF(x = subset(data.train, select = -over50K),
               ntreeTry = 250)
 ```
 
-    ## mtry = 3  OOB error = 13.88% 
+    ## mtry = 3  OOB error = 14.12% 
     ## Searching left ...
-    ## mtry = 2     OOB error = 13.61% 
-    ## 0.01959545 0.05 
+    ## mtry = 2     OOB error = 14.02% 
+    ## 0.007380074 0.05 
     ## Searching right ...
-    ## mtry = 6     OOB error = 14.53% 
-    ## -0.04677623 0.05
+    ## mtry = 6     OOB error = 14.73% 
+    ## -0.04327407 0.05
 
 ![](ML_parameter_tuning_files/figure-markdown_github/randomForest-3.png)
 
@@ -491,9 +511,9 @@ print(res)
 ```
 
     ##       mtry  OOBError
-    ## 2.OOB    2 0.1361004
-    ## 3.OOB    3 0.1388206
-    ## 6.OOB    6 0.1453141
+    ## 2.OOB    2 0.1401506
+    ## 3.OOB    3 0.1411926
+    ## 6.OOB    6 0.1473026
 
 ``` r
 # Finding the mtry value that minimizes OOB Error
@@ -559,21 +579,21 @@ summary(income_model)
 
 ![](ML_parameter_tuning_files/figure-markdown_github/GBM-1.png)
 
-    ##                           var     rel.inf
-    ## relationship     relationship 33.10075160
-    ## capital.gain     capital.gain 21.86101921
-    ## occupation         occupation 10.98831710
-    ## marital.status marital.status  7.25923717
-    ## education           education  7.10752583
-    ## education.num   education.num  6.69655831
-    ## age                       age  5.16407500
-    ## capital.loss     capital.loss  4.26834925
-    ## hours.per.week hours.per.week  3.26580111
-    ## workclass           workclass  0.27193477
-    ## native.country native.country  0.01643064
-    ## fnlwgt                 fnlwgt  0.00000000
-    ## race                     race  0.00000000
-    ## sex                       sex  0.00000000
+    ##                           var      rel.inf
+    ## relationship     relationship 33.164385284
+    ## capital.gain     capital.gain 23.002725120
+    ## occupation         occupation 10.008497601
+    ## education           education  7.790916904
+    ## marital.status marital.status  6.351260917
+    ## education.num   education.num  6.242669206
+    ## capital.loss     capital.loss  4.818891081
+    ## age                       age  4.796966034
+    ## hours.per.week hours.per.week  3.485106565
+    ## workclass           workclass  0.322101698
+    ## native.country native.country  0.015443813
+    ## fnlwgt                 fnlwgt  0.001035777
+    ## race                     race  0.000000000
+    ## sex                       sex  0.000000000
 
 ``` r
 # converting the test response col
@@ -594,13 +614,13 @@ preds2 <- predict(object = income_model,
 auc(actual = data.test$over50K, predicted = preds1)  #default
 ```
 
-    ## [1] 0.9106118
+    ## [1] 0.9043753
 
 ``` r
 auc(actual = data.test$over50K, predicted = preds2)  #rescaled
 ```
 
-    ## [1] 0.9106118
+    ## [1] 0.9043753
 
 ``` r
 # Optimal ntree estimate based on OOB
@@ -659,13 +679,13 @@ auc2 <- auc(actual = data.test$over50K, predicted = preds2)  #CV
 print(paste0("Test set AUC (OOB): ", auc1))                         
 ```
 
-    ## [1] "Test set AUC (OOB): 0.91061183602998"
+    ## [1] "Test set AUC (OOB): 0.904375314962919"
 
 ``` r
 print(paste0("Test set AUC (CV): ", auc2))
 ```
 
-    ## [1] "Test set AUC (CV): 0.910647541250014"
+    ## [1] "Test set AUC (CV): 0.904355952554718"
 
 ``` r
 if(auc1 >= auc2){
@@ -692,25 +712,25 @@ gbm_auc <- auc(actual = actual, predicted = gbm_preds)
 sprintf("Decision Tree Test AUC: %.3f", dt_auc)
 ```
 
-    ## [1] "Decision Tree Test AUC: 0.849"
+    ## [1] "Decision Tree Test AUC: 0.842"
 
 ``` r
 sprintf("Bagged Trees Test AUC: %.3f", bag_auc)
 ```
 
-    ## [1] "Bagged Trees Test AUC: 0.822"
+    ## [1] "Bagged Trees Test AUC: 0.810"
 
 ``` r
 sprintf("Random Forest Test AUC: %.3f", rf_auc)
 ```
 
-    ## [1] "Random Forest Test AUC: 0.911"
+    ## [1] "Random Forest Test AUC: 0.906"
 
 ``` r
 sprintf("GBM Test AUC: %.3f", gbm_auc)
 ```
 
-    ## [1] "GBM Test AUC: 0.911"
+    ## [1] "GBM Test AUC: 0.904"
 
 ``` r
 auc_list <- c(dt_auc, bag_auc, rf_auc, gbm_auc)
@@ -721,4 +741,4 @@ best_model <- auc_models[which(auc_list == max(auc_list))]
 best_auc <- round(max(auc_list), 3)
 ```
 
-So it seems that the best model for prediction is: Random Forest with the AUC score of 0.911
+So it seems that the best model for prediction is the one generated by: Random Forest. The AUC score is 0.906
